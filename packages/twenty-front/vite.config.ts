@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
   const {
     VITE_BUILD_SOURCEMAP,
     VITE_HOST,
+    VITE_ALLOWED_HOSTS,
     SSL_CERT_PATH,
     SSL_KEY_PATH,
     REACT_APP_PORT,
@@ -36,6 +37,12 @@ export default defineConfig(({ mode }) => {
   const port = isNonEmptyString(REACT_APP_PORT)
     ? parseInt(REACT_APP_PORT)
     : 3001;
+
+  const allowedHosts = isNonEmptyString(VITE_ALLOWED_HOSTS)
+    ? VITE_ALLOWED_HOSTS.split(',')
+        .map((allowedHost) => allowedHost.trim())
+        .filter((allowedHost) => allowedHost.length > 0)
+    : undefined;
 
   const apiProxyTarget = isNonEmptyString(REACT_APP_SERVER_BASE_URL)
     ? REACT_APP_SERVER_BASE_URL
@@ -68,6 +75,7 @@ export default defineConfig(({ mode }) => {
       port: port,
       proxy: apiProxy,
       ...(VITE_HOST ? { host: VITE_HOST } : {}),
+      ...(allowedHosts ? { allowedHosts } : {}),
       ...(SSL_KEY_PATH && SSL_CERT_PATH
         ? {
             protocol: 'https',
